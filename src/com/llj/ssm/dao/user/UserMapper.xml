@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 映射文件的根节点，只有一个属性 namespace 属性值是用来区分不同的mapper 全局唯一 -->
+<mapper namespace="com.llj.ssm.dao.user.UserMapper">
+	<resultMap type="User" id="userList">
+		<id property="id" column="id" />
+		<result property="userCode" column="userCode" />
+		<result property="userName" column="userName" />
+		<result property="address" column="address" />
+		<result property="userRoleName" column="roleName" />
+	</resultMap>
+
+	<!-- 示例2 -->
+	<!-- <select id="getUserList" resultMap="userList"> select u.*,r.roleName 
+		userRoleName from smbms_user u,smbms_role r where u.userRole = r.id and u.userName 
+		like CONCAT('%',#{userName},'%') and u.userRole= #{userRole} </select> -->
+
+	<!-- 示例4 -->
+	<!-- <select id="getUserList" resultMap="userList"> select u.*,r.roleName 
+		userRoleName from smbms_user u,smbms_role r where u.userRole = r.id <if test="userRole!=null"> 
+		and u.userRole= #{userRole} </if> <if test="userName!=null and userName!=''"> 
+		and u.userName like CONCAT('%',#{userName},'%') </if> </select> -->
+
+	<!-- 示例5 -->
+	<!-- <select id="getUserList" resultMap="userList"> select * from smbms_user 
+		<where> <if test="userName!=null and userName!=''"> and userName like CONCAT('%',#{userName},'%') 
+		</if> <if test="userRole!=null"> and userRole= #{userRole} </if> </where> 
+		</select> -->
+	<!-- 示例6 -->
+	<select id="getUserList" resultMap="userList">
+		select * from smbms_user
+		<trim prefix="where" prefixOverrides="and | or">
+			<if test="userName!=null and userName!=''">
+				and userName like CONCAT('%',#{userName},'%')
+			</if>
+			<if test="userRole!=null">
+				and userRole= #{userRole}
+			</if>
+		</trim>
+	</select>
+	<!-- 示例7 -->
+	<!-- <update id="update" parameterType="User">
+		UPDATE `smbms_user`
+		<set>
+			<if test="userCode !=null">`userCode`=#{userCode},</if>
+			<if test="userName !=null">`userName`=#{userName},</if>
+			<if test="userPassword !=null">`userPassword`=#{userPassword},</if>
+			<if test="gender !=null">`gender`=#{gender},</if>
+			<if test="birthday !=null">`birthday`=#{birthday},</if>
+			<if test="phone !=null">`phone`=#{phone},</if>
+			<if test="address !=null">`address`=#{address},</if>
+			<if test="userRole !=null">`userRole`=#{userRole},</if>
+			<if test="modifyBy !=null">`modifyBy`=#{modifyBy},</if>
+			<if test="modifyDate !=null">`modifyDate`=#{modifyDate},</if>
+		</set>
+		WHERE id=#{id}
+	</update> -->
+	<!-- 示例8 -->
+	<update id="update" parameterType="User">
+		UPDATE `smbms_user`
+		<trim prefix="set" suffixOverrides="," suffix="WHERE id=#{id}">
+			<if test="userCode !=null">`userCode`=#{userCode},</if>
+			<if test="userName  !=null">`userName`=#{userName},</if>
+			<if test="userPassword !=null">`userPassword`=#{userPassword},</if>
+			<if test="gender !=null">`gender`=#{gender},</if>
+			<if test="birthday !=null">`birthday`=#{birthday},</if>
+			<if test="phone !=null">`phone`=#{phone},</if>
+			<if test="address !=null">`address`=#{address},</if>
+			<if test="userRole !=null">`userRole`=#{userRole},</if>
+			<if test="modifyBy !=null">`modifyBy`=#{modifyBy},</if>
+			<if test="modifyDate !=null">`modifyDate`=#{modifyDate},</if>
+		</trim>
+	</update>
+
+	<!-- 示例10 -->
+	<select id="getUserListByArray" resultMap="userList">
+		select * from smbms_user where userRole in
+		<foreach collection="array" item="roleIds" open="(" separator=","
+			close=")">
+			#{roleIds}
+		</foreach>
+	</select>
+
+	<!-- 示例13 -->
+	<select id="getUserListByList" resultMap="userList">
+		select * from smbms_user where userRole in
+		<foreach collection="list" item="roleIdList" open="("
+			separator="," close=")">
+			#{roleIdList}
+		</foreach>
+	</select>
+	<!-- 示例15 -->
+	<select id="getUserListByMap" resultMap="userList">
+		select * from smbms_user where gender=#{gender} and userRole in
+		<foreach collection="roleIds" item="roleMap" open="("
+			separator="," close=")">
+			#{roleMap}
+		</foreach>
+	</select>
+
+	<!-- 示例17 -->
+	<select id="getUserListByMaps" resultMap="userList">
+		select * from smbms_user where userRole in
+		<foreach collection="roleIds" item="roleMap" open="("
+			separator="," close=")">
+			#{roleMap}
+		</foreach>
+	</select>
+	<!-- 示例19 -->
+	<select id="getUserList_choose" resultMap="userList">
+		select * from smbms_user where 1=1
+		<choose>
+			<when test="userCode !=null and userCode !=''">
+				and userCode like CONCAT('%',#{userCode},'%')
+			</when>
+			<when test="userName !=null and userName !=''">
+				and userName like CONCAT('%',#{userName},'%')
+			</when>
+			<when test="userRole!=null">
+				and userRole=#{userRole}
+			</when>
+			<otherwise>
+				and YEAR(creationDate)=YEAR(#{creationDate})
+			</otherwise>
+		</choose>
+	</select>
+	<!-- 查询总记录数 -->
+	<select id="count" resultType="int">
+		select count(*) as count from
+		smbms_user
+	</select>
+	<!-- 分页查询 -->
+	<select id="getUserList_FY" resultMap="userList">
+		SELECT u.*,r.roleName FROM `smbms_user` u,`smbms_role` r WHERE
+		u.userRole=r.id
+		<if test="userName  !=null  and userName !=''">
+			and userName like CONCAT('%',#{userName},'%')
+		</if>
+		<if test="userRole !=null">
+			`userRole`=#{userRole}
+		</if>
+		ORDER BY `creationDate` DESC LIMIT #{from},#{pageSize}
+	</select>
+</mapper>

@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.llj.ssm.dao.user.ProviderMapper">
+
+	<!-- <resultMap type="Provider" id="ProviderResult"> <id property="id" column="p_id" 
+		/> <result property="proCode" column="proCode" /> <result property="proName" 
+		column="proName" /> <result property="proContact" column="proContact" /> 
+		<result property="proPhone" column="proPhone" /> <collection property="bills" 
+		ofType="Bill"> <result property="billCode" column="billCode" /> <result property="productName" 
+		column="productName" /> <result property="totalPrice" column="totalPrice" 
+		/> <result property="isPayment" column="isPayment" /> </collection> </resultMap> 
+		<select id="listinfoByPid" parameterType="integer" resultMap="ProviderResult 
+		"> SELECT b.`billCode`,b.`productName`,b.`totalPrice`,b.`isPayment`,p.`id` 
+		p_id, p.`proCode`,p.`proName`,p.`proContact`,p.`proPhone` FROM `smbms_bill` 
+		b,`smbms_provider` p WHERE p.`id`=b.`providerId` AND p.id=#{id} </select> -->
+
+	<!-- 上机练习 2 -->
+	<select id="listInfoByNameORCode" resultType="Provider">
+		SELECT
+		`id`,`proCode`,`proName`,`proContact`,`proPhone`,`proFax`,`creationDate`
+		FROM `smbms_provider`
+		<where>
+			<if test="code!=null">
+				and `proCode` LIKE CONCAT('%','G','%')
+			</if>
+			<if test="name!=null">
+				AND `proName`LIKE CONCAT('%','深','%')
+			</if>
+		</where>
+	</select>
+
+	<!-- 上机练习 3 -->
+	<!-- <update id="update" parameterType="Provider"> UPDATE `smbms_provider` 
+		<set> <if test="proCode !=null">`proCode`=#{proCode},</if> <if test="proContact 
+		!=null">`proContact`=#{proContact},</if> <if test="proPhone !=null">`proPhone`=#{proPhone},</if> 
+		<if test="proAddress !=null">`proAddress`=#{proAddress},</if> <if test="proFax 
+		!=null">`proFax`=#{proFax},</if> <if test="proName !=null">`proName`=#{proName},</if> 
+		<if test="proDesc !=null">`proDesc`=#{proDesc},</if> <if test="modifyBy !=0">`modifyBy`=#{modifyBy},</if> 
+		<if test="modifyDate !=null">`modifyDate`=#{modifyDate},</if> </set> WHERE 
+		`id`=#{id} </update> -->
+
+	<!-- 上机练习 4 -->
+	<update id="update" parameterType="Provider">
+		UPDATE `smbms_provider`
+		<trim prefix="set" suffixOverrides="," suffix="WHERE `id`=#{id}">
+			<if test="proCode !=null">`proCode`=#{proCode},</if>
+			<if test="proContact  !=null">`proContact`=#{proContact},</if>
+			<if test="proPhone !=null">`proPhone`=#{proPhone},</if>
+			<if test="proAddress !=null">`proAddress`=#{proAddress},</if>
+			<if test="proFax !=null">`proFax`=#{proFax},</if>
+			<if test="proName !=null">`proName`=#{proName},</if>
+			<if test="proDesc !=null">`proDesc`=#{proDesc},</if>
+			<if test="modifyBy !=0">`modifyBy`=#{modifyBy},</if>
+			<if test="modifyDate !=null">`modifyDate`=#{modifyDate},</if>
+		</trim>
+	</update>
+	<!-- 上机练习5 -->
+	<select id="listinfo_Array" resultType="Provider">
+		SELECT
+		`id`,`proCode`,`proName`,`proContact`,`proPhone`,`proFax`,`creationDate`
+		FROM `smbms_provider` where id in
+		<foreach collection="array" item="proIds" open="(" separator=","
+			close=")">
+			#{proIds}
+		</foreach>
+	</select>
+
+	<select id="listinfo_List" resultType="Provider">
+		SELECT
+		`id`,`proCode`,`proName`,`proContact`,`proPhone`,`proFax`,`creationDate`
+		FROM `smbms_provider` where id in
+		<foreach collection="list" item="proIds" open="(" separator=","
+			close=")">
+			#{proIds}
+		</foreach>
+	</select>
+
+	<!-- <resultMap type="Provider" id="ProviderResult"> <id property="id" column="id" 
+		/> <result property="proCode" column="proCode" /> <result property="proName" 
+		column="proName" /> <result property="proContact" column="proContact" /> 
+		<result property="proPhone" column="proPhone" /> <result property="proFax" 
+		column="proFax" /> <result property="creationDate" column="creationDate" 
+		/> </resultMap> -->
+	<!-- 上机练习6 -->
+	<select id="listinfo_Map" resultType="Provider">
+		SELECT
+		`id`,`proCode`,`proName`,`proContact`,`proPhone`,`proFax`,`creationDate`
+		FROM `smbms_provider` where proCode like CONCAT('%',#{proCode},'%')
+		and id in
+		<foreach collection="proIds" item="proIds" open="(" separator=","
+			close=")">
+			#{proIds}
+		</foreach>
+	</select>
+
+	<!-- 上机练习7 -->
+	<select id="listinfo_choose" resultType="Provider">
+		SELECT
+		`id`,`proCode`,`proName`,`proContact`,`proPhone`,`proFax`,`creationDate`
+		FROM `smbms_provider` where 1=1
+		<choose>
+			<when test="proCode !=null and proCode!=''">
+				and proCode like CONCAT('%',#{proCode},'%')
+			</when>
+			<when test="proName !=null and proName!=''">
+				and proName like CONCAT('%',#{proName},'%')
+			</when>
+			<when test="proContact !=null and proContact!=''">
+				and proContact like CONCAT('%',#{proContact},'%')
+			</when>
+			<otherwise>
+			and YEAR(creationDate)=2018
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="count" resultType="integer">
+	SELECT COUNT(*) FROM `smbms_provider`
+	</select>
+	
+	<select id="listinfo_FY" resultType="Provider">
+	SELECT `id`,`proCode`,`proName`,`proContact`,`proPhone` 
+	FROM `smbms_provider` ORDER BY `creationDate` DESC LIMIT #{from},#{pageSize}
+	</select>
+</mapper>

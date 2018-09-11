@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.llj.ssm.dao.user.BillMapper">
+	<!-- 上机练习1 -->
+	<select id="listinfo" resultType="Bill">
+		SELECT
+		b.`billCode`,b.`productName`,p.`proName`
+		providerName,b.`totalPrice`,b.`isPayment`,b.`creationDate`
+		FROM
+		`smbms_bill` b,`smbms_provider` p
+		WHERE b.`providerId`=p.`id`
+		<if test="productName!=null and productName!=''">
+			AND b.`productName` LIKE CONCAT('%',#{productName},'%')
+		</if>
+		<if test="providerId!=null">
+			AND b.`providerId`=#{providerId}
+		</if>
+		<if test="isPayment!=null">
+			AND b.`isPayment`=#{isPayment}
+		</if>
+	</select>
+
+
+	<resultMap type="Bill" id="BillResult">
+		<result property="billCode" column="billCode" />
+		<result property="productName" column="productName" />
+		<result property="totalPrice" column="totalPrice" />
+		<result property="isPayment" column="isPayment" />
+		<result property="creationDate" column="creationDate" />
+		<result property="providerId" column="providerId" />
+		<association property="provider" javaType="Provider">
+			<result property="proCode" column="proCode" />
+			<result property="proName" column="proName" />
+			<result property="proContact" column="proContact" />
+			<result property="proPhone" column="proPhone" />
+		</association>
+	</resultMap>
+
+	<select id="count" resultType="integer">
+		SELECT COUNT(*) FROM `smbms_bill`
+	</select>
+
+	<select id="listinfo_FY" resultType="Bill">
+		SELECT
+		`id`,`billCode`,`productName`,`totalPrice`,`isPayment`
+		FROM `smbms_bill` ORDER BY `creationDate` DESC LIMIT #{from},#{pageSize}
+	</select>
+	<!-- 简答题 -->
+	<update id="update" parameterType="Bill" >
+		UPDATE `smbms_bill`
+		<set>
+			<if test="billCode !=null">`billCode`=#{billCode},</if>
+			<if test="productName !=null">`productName`=#{productName},</if>
+			<if test="productDesc !=null">`productDesc`=#{productDesc},</if>
+			<if test="productUnit !=null">`productUnit`=#{productUnit},</if>
+			<if test="productCount !=0">`productCount`=#{productCount},</if>
+			<if test="totalPrice !=0">`totalPrice`=#{totalPrice},</if>
+			<if test="isPayment !=0">`isPayment`=#{isPayment},</if>
+			<if test="providerId !=0">`providerId`=#{providerId},</if>
+			<if test="modifyBy !=0">`modifyBy`=#{modifyBy},</if>
+			<if test="modifyDate !=null">`modifyDate`=#{modifyDate},</if>
+		</set>
+		WHERE id=#{id}
+	</update>
+
+</mapper>

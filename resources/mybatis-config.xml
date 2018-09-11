@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-config.dtd">
+
+<!-- 通过这个配置文件完成mybatis与数据库的连接 -->
+<configuration>
+	<!-- 引入外部 database.properties 文件-->
+	<properties resource="database.properties"></properties>
+	<!-- 配置mybatis的log实现为LOG4J -->
+	<settings>
+		<setting name="logImpl" value="LOG4J" />
+		<!-- 设置自动映射级别，默认级别为partial 自动进行属性匹配，如果有特殊类型除外(类里面嵌套类，类里面嵌套集合)。  
+		禁止自动匹配： autoMappingBehavior 值：NONE,当取fULL值时是自动匹配所有-->
+		<setting name="autoMappingBehavior" value="FULL"/>
+	</settings>
+	<!--typeAliases 类型别名  -->
+		<typeAliases>
+		  <package name="com.llj.ssm.entity"/> 
+		</typeAliases>
+	<!-- 表示MyBatis的多套运行环境，将sql映射到多个不同的数据库上，必须指定一个默认的运行环境 -->
+	<environments default="development">
+	<!-- 表示配置MyBatis的一套运行环境，需要制定运行id,事务管理，数据源配置，等相关信息 -->
+		<environment id="development">
+			<!--配置事务管理，采用JDBC的事务管理  -->
+			<transactionManager type="JDBC"></transactionManager>
+			<!-- POOLED:mybatis自带的数据源，JNDI:基于tomcat的数据源 -->
+			<dataSource type="POOLED">
+				<property name="driver" value="${driver}"/>
+				<property name="url" value="${url}"/>
+				<property name="username" value="${user}"/>
+				<property name="password" value="${password}"/>
+			</dataSource>
+		</environment>
+	</environments>
+	
+	<!-- 将mapper文件加入到配置文件中 -->
+	<!-- 告诉MyBatis去哪里找到sql映射文件，整个项目中可以有一个或者多个sql映射文件 -->
+	<mappers>
+		<!-- 指定具体的sql映射文件的路径 -->
+		 <mapper resource="com/llj/ssm/dao/user/UserMapper.xml"/> 
+		 <mapper resource="com/llj/ssm/dao/user/BillMapper.xml"/>
+		  <mapper resource="com/llj/ssm/dao/user/ProviderMapper.xml"/>
+		   <mapper resource="com/llj/ssm/dao/user/RoleMapper.xml"/>
+	</mappers>
+
+</configuration>
